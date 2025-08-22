@@ -1,0 +1,94 @@
+{
+  "terms": [
+    {
+      "term": "Bitcoin",
+      "definition": "A decentralized digital currency created by Satoshi Nakamoto in 2008. It operates on a peer-to-peer network without central authority, enabling direct transactions between parties without financial institutions.",
+      "source": "Bitcoin Whitepaper",
+      "category": "fundamentals"
+    },
+    {
+      "term": "Proof of Work",
+      "definition": "A consensus mechanism where miners compete to solve computationally difficult puzzles to validate transactions and secure the network. The first miner to solve the puzzle gets to add the next block.",
+      "source": "Bitcoin Whitepaper Section 4",
+      "category": "consensus"
+    },
+    {
+      "term": "Mining",
+      "definition": "The process of validating Bitcoin transactions and adding them to the blockchain by solving cryptographic puzzles. Miners are rewarded with newly created bitcoins and transaction fees.",
+      "source": "Bitcoin Protocol",
+      "category": "mining"
+    },
+    {
+      "term": "Blockchain",
+      "definition": "A distributed ledger of Bitcoin transactions, organized in chronological blocks and secured by cryptographic hashes. Each block contains a reference to the previous block.",
+      "source": "Bitcoin Whitepaper",
+      "category": "technology"
+    },
+    {
+      "term": "Private Key",
+      "definition": "A secret cryptographic key that allows the owner to spend Bitcoin associated with a specific Bitcoin address. It must be kept secure as anyone with access can spend the bitcoins.",
+      "source": "Bitcoin Cryptography",
+      "category": "security"
+    },
+    {
+      "term": "Public Key",
+      "definition": "A cryptographic key derived from a private key that can be shared publicly. It is used to generate Bitcoin addresses and verify digital signatures.",
+      "source": "Bitcoin Cryptography",
+      "category": "security"
+    },
+    {
+      "term": "Hash",
+      "definition": "A fixed-length string produced by a hash function. In Bitcoin, SHA-256 is used to create unique identifiers for blocks and transactions.",
+      "source": "Bitcoin Technical Documentation",
+      "category": "technology"
+    },
+    {
+      "term": "Satoshi Nakamoto",
+      "definition": "The pseudonymous creator of Bitcoin who published the Bitcoin whitepaper in 2008 and released the first Bitcoin software. Their true identity remains unknown.",
+      "source": "Bitcoin History",
+      "category": "history"
+    },
+    {
+      "term": "Satoshi",
+      "definition": "The smallest unit of Bitcoin, equal to 0.00000001 BTC. Named after Bitcoin's creator, Satoshi Nakamoto.",
+      "source": "Bitcoin Protocol",
+      "category": "units"
+    },
+    {
+      "term": "Halving",
+      "definition": "An event occurring approximately every 4 years where the Bitcoin block reward is reduced by half. This controls Bitcoin's inflation rate and ensures the 21 million coin supply limit.",
+      "source": "Bitcoin Protocol",
+      "category": "economics"
+    },
+    {
+      "term": "Node",
+      "definition": "A computer that participates in the Bitcoin network by maintaining a copy of the blockchain and relaying transactions and blocks to other nodes.",
+      "source": "Bitcoin Network",
+      "category": "network"
+    },
+    {
+      "term": "Wallet",
+      "definition": "Software that stores Bitcoin private keys and allows users to send and receive Bitcoin transactions. The wallet doesn't actually store bitcoins, only the keys to access them.",
+      "source": "Bitcoin Software",
+      "category": "software"
+    },
+    {
+      "term": "Transaction Fee",
+      "definition": "A small amount of Bitcoin paid to miners for including a transaction in a block. Fees incentivize miners and help prevent spam transactions.",
+      "source": "Bitcoin Economics",
+      "category": "economics"
+    },
+    {
+      "term": "UTXO",
+      "definition": "Unspent Transaction Output - the fundamental building block of Bitcoin transactions. Each UTXO represents a specific amount of bitcoin that can be spent.",
+      "source": "Bitcoin Protocol",
+      "category": "technology"
+    },
+    {
+      "term": "Lightning Network",
+      "definition": "A second-layer payment protocol built on top of Bitcoin that enables fast, low-cost transactions through payment channels.",
+      "source": "Lightning Network Whitepaper",
+      "category": "scaling"
+    }
+  ]
+}
