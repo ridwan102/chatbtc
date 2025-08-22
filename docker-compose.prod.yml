@@ -1,0 +1,70 @@
+services:
+  # Frontend - Next.js Application
+  frontend:
+    build: 
+      context: ./frontend
+      dockerfile: Dockerfile
+    ports:
+      - "${PORT:-3000}:3000"
+    environment:
+      - NODE_ENV=production
+      - NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL:-http://localhost:8000}
+    depends_on:
+      - backend
+    networks:
+      - chatbtc-network
+
+  # Backend - FastAPI Application
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"
+    environment:
+      - DATABASE_URL=${DATABASE_URL}
+      - QDRANT_URL=${QDRANT_URL:-http://qdrant:6333}
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - COINGECKO_API_KEY=${COINGECKO_API_KEY}
+      - CRYPTOPANIC_API_KEY=${CRYPTOPANIC_API_KEY}
+      - ENVIRONMENT=production
+    volumes:
+      - ./data:/app/data
+    depends_on:
+      - postgres
+      - qdrant
+    networks:
+      - chatbtc-network
+
+  # PostgreSQL Database
+  postgres:
+    image: postgres:15-alpine
+    environment:
+      - POSTGRES_DB=${POSTGRES_DB:-chatbtc_db}
+      - POSTGRES_USER=${POSTGRES_USER:-chatbtc}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-password}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - chatbtc-network
+
+  # Qdrant Vector Database
+  qdrant:
+    image: qdrant/qdrant:v1.7.4
+    ports:
+      - "6333:6333"  # REST API
+      - "6334:6334"  # Web UI
+    volumes:
+      - qdrant_data:/qdrant/storage
+    networks:
+      - chatbtc-network
+
+volumes:
+  postgres_data:
+  qdrant_data:
+
+networks:
+  chatbtc-network:
+    driver: bridge
