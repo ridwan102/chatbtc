@@ -75,7 +75,7 @@ export default function ChatInterface({ sessionId = 'default', className, initia
               <div className="w-16 h-16 bitcoin-gradient rounded-full flex items-center justify-center mx-auto">
                 <span className="text-white font-bold text-2xl">₿</span>
               </div>
-              <h2 className="text-3xl font-semibold">How can I help you today?</h2>
+              <h2 className="text-3xl font-semibold">I'm ready for all your Bitcoin questions</h2>
             </div>
 
             {/* Example Questions */}
