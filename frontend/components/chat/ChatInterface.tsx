@@ -1,13 +1,11 @@
 'use client'
 
 import { useState, useEffect, useRef } from 'react'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import LoadingSpinner, { LoadingDots } from '@/components/shared/LoadingSpinner'
 import { useChat } from '@/lib/hooks/useChat'
-import { formatDateTime } from '@/lib/utils'
-import { Send, Copy, ExternalLink } from 'lucide-react'
+import { Copy, ArrowUp } from 'lucide-react'
 
 interface ChatInterfaceProps {
   sessionId?: string
@@ -20,10 +18,21 @@ export default function ChatInterface({ sessionId = 'default', className, initia
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const { messages, isLoading, error, sendMessage, clearError } = useChat(sessionId)
 
-  // Set initial message when provided
+  const examples = [
+    "What is Bitcoin and how does it work?",
+    "Explain Bitcoin mining in simple terms",
+    "What makes Bitcoin different from traditional money?",
+    "Who created Bitcoin and why?"
+  ]
+
+  // Set initial message and send it
   useEffect(() => {
     if (initialMessage && initialMessage !== inputMessage) {
       setInputMessage(initialMessage)
+      // Auto-send the initial message
+      setTimeout(() => {
+        sendMessage(initialMessage, sessionId)
+      }, 100)
     }
   }, [initialMessage])
 
@@ -40,7 +49,7 @@ export default function ChatInterface({ sessionId = 'default', className, initia
     await sendMessage(message, sessionId)
   }
 
-  const handleKeyPress = (e: React.KeyboardEvent) => {
+  const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault()
       handleSendMessage()
@@ -50,175 +59,157 @@ export default function ChatInterface({ sessionId = 'default', className, initia
   const copyToClipboard = async (text: string) => {
     try {
       await navigator.clipboard.writeText(text)
-      // Could add a toast notification here
     } catch (err) {
       console.error('Failed to copy text:', err)
     }
   }
 
   return (
-    <Card className={className}>
-      <CardHeader className="border-b">
-        <CardTitle className="flex items-center space-x-2">
-          <div className="w-8 h-8 bitcoin-gradient rounded-full flex items-center justify-center">
-            <span className="text-white font-bold text-sm">₿</span>
-          </div>
-          <span>Bitcoin ChatGPT</span>
-        </CardTitle>
-        <p className="text-sm text-muted-foreground">
-          Ask me anything about Bitcoin - I'll search the knowledge base for accurate answers
-        </p>
-      </CardHeader>
-      
-      <CardContent className="flex flex-col h-[600px]">
-        {/* Messages Area */}
-        <div className="flex-1 overflow-y-auto space-y-4 py-4">
-          {messages.length === 0 && !isLoading && (
-            <div className="text-center text-muted-foreground py-8">
-              <div className="mb-4">
-                <div className="w-16 h-16 bitcoin-gradient rounded-full flex items-center justify-center mx-auto mb-4">
-                  <span className="text-white font-bold text-2xl">₿</span>
-                </div>
-                <h3 className="text-lg font-semibold mb-2">Welcome to Bitcoin ChatGPT!</h3>
-                <p className="text-sm">Ask me anything about Bitcoin and I'll provide accurate answers with citations.</p>
+    <div className={`flex flex-col h-full max-w-4xl mx-auto ${className}`}>
+      {/* Messages Area */}
+      <div className="flex-1 overflow-y-auto px-4">
+        {/* Welcome Screen */}
+        {messages.length === 0 && !isLoading && (
+          <div className="flex flex-col items-center justify-center h-full space-y-8">
+            <div className="text-center space-y-4">
+              <div className="w-16 h-16 bitcoin-gradient rounded-full flex items-center justify-center mx-auto">
+                <span className="text-white font-bold text-2xl">₿</span>
               </div>
-              <div className="space-y-2 text-sm">
-                <p className="font-medium">Try asking:</p>
-                <div className="space-y-1">
-                  <button 
-                    onClick={() => setInputMessage("What is Bitcoin?")}
-                    className="block w-full text-left hover:text-bitcoin-orange transition-colors"
-                  >
-                    • "What is Bitcoin?"
-                  </button>
-                  <button 
-                    onClick={() => setInputMessage("What is proof of work?")}
-                    className="block w-full text-left hover:text-bitcoin-orange transition-colors"
-                  >
-                    • "What is proof of work?"
-                  </button>
-                  <button 
-                    onClick={() => setInputMessage("Who created Bitcoin?")}
-                    className="block w-full text-left hover:text-bitcoin-orange transition-colors"
-                  >
-                    • "Who created Bitcoin?"
-                  </button>
-                </div>
-              </div>
+              <h2 className="text-3xl font-semibold">How can I help you today?</h2>
             </div>
-          )}
-          
+
+            {/* Example Questions */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3 w-full max-w-2xl">
+              {examples.map((example, index) => (
+                <button
+                  key={index}
+                  onClick={() => setInputMessage(example)}
+                  className="p-4 rounded-lg border border-border hover:bg-muted transition-colors text-left text-sm"
+                >
+                  {example}
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Messages */}
+        <div className="space-y-6 py-6">
           {messages.map((message) => (
-            <div
-              key={message.id}
-              className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}
-            >
-              <div
-                className={`max-w-[80%] rounded-lg px-4 py-3 ${
-                  message.role === 'user'
-                    ? 'bg-bitcoin-orange text-white ml-4'
-                    : 'bg-muted text-foreground mr-4'
-                }`}
-              >
-                <div className="whitespace-pre-wrap leading-relaxed">
-                  {message.content}
-                </div>
-                
-                {/* Citations */}
-                {message.citations && message.citations.length > 0 && (
-                  <div className="mt-3 pt-3 border-t border-muted-foreground/20">
-                    <p className="text-sm font-semibold mb-2 opacity-90">Sources:</p>
-                    <div className="space-y-1">
-                      {message.citations.map((citation, index) => (
-                        <div key={index} className="text-sm opacity-80 flex items-start space-x-2">
-                          <ExternalLink className="w-3 h-3 mt-0.5 flex-shrink-0" />
-                          <span>{citation}</span>
-                        </div>
-                      ))}
-                    </div>
+            <div key={message.id} className="group">
+              <div className={`flex items-start space-x-4 ${
+                message.role === 'user' ? 'justify-end' : 'justify-start'
+              }`}>
+                {message.role === 'assistant' && (
+                  <div className="w-8 h-8 bitcoin-gradient rounded-full flex items-center justify-center flex-shrink-0 mt-1">
+                    <span className="text-white font-bold text-sm">₿</span>
                   </div>
                 )}
                 
-                {/* Message metadata */}
-                <div className="flex items-center justify-between mt-2 pt-2 border-t border-muted-foreground/20">
-                  <span className="text-xs opacity-70">
-                    {formatDateTime(message.timestamp)}
-                  </span>
-                  <div className="flex items-center space-x-2">
-                    {message.model_used && (
-                      <span className="text-xs opacity-70">{message.model_used}</span>
-                    )}
-                    <button
-                      onClick={() => copyToClipboard(message.content)}
-                      className="opacity-70 hover:opacity-100 transition-opacity"
-                    >
-                      <Copy className="w-3 h-3" />
-                    </button>
+                <div className={`max-w-[70%] ${message.role === 'user' ? 'order-2' : ''}`}>
+                  <div className={`${
+                    message.role === 'user' 
+                      ? 'bg-bitcoin-orange text-white rounded-2xl px-4 py-3' 
+                      : 'text-foreground'
+                  }`}>
+                    <div className="whitespace-pre-wrap leading-relaxed">
+                      {message.content}
+                    </div>
                   </div>
+
+                  {/* Citations for assistant messages */}
+                  {message.role === 'assistant' && message.citations && message.citations.length > 0 && (
+                    <div className="mt-3 pt-3 border-t border-border">
+                      <p className="text-sm font-medium mb-2 text-muted-foreground">Sources:</p>
+                      <div className="space-y-1">
+                        {message.citations.map((citation, index) => (
+                          <div key={index} className="text-sm text-muted-foreground">
+                            {citation}
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Copy button for assistant messages */}
+                  {message.role === 'assistant' && (
+                    <div className="opacity-0 group-hover:opacity-100 transition-opacity mt-2">
+                      <button
+                        onClick={() => copyToClipboard(message.content)}
+                        className="p-1 rounded hover:bg-muted transition-colors"
+                        title="Copy message"
+                      >
+                        <Copy className="w-4 h-4 text-muted-foreground" />
+                      </button>
+                    </div>
+                  )}
                 </div>
+
+                {message.role === 'user' && (
+                  <div className="w-8 h-8 bg-bitcoin-orange rounded-full flex items-center justify-center flex-shrink-0 mt-1 order-1">
+                    <span className="text-white font-bold text-sm">U</span>
+                  </div>
+                )}
               </div>
             </div>
           ))}
-          
+
           {/* Loading indicator */}
           {isLoading && (
-            <div className="flex justify-start">
-              <div className="bg-muted rounded-lg px-4 py-3 mr-4">
-                <div className="flex items-center space-x-2">
-                  <LoadingDots />
-                  <span className="text-sm text-muted-foreground">
-                    Searching Bitcoin knowledge...
-                  </span>
-                </div>
+            <div className="flex items-start space-x-4">
+              <div className="w-8 h-8 bitcoin-gradient rounded-full flex items-center justify-center flex-shrink-0">
+                <span className="text-white font-bold text-sm">₿</span>
+              </div>
+              <div className="flex items-center space-x-2">
+                <LoadingDots />
+                <span className="text-sm text-muted-foreground">Thinking...</span>
               </div>
             </div>
           )}
-          
+
           {/* Error message */}
           {error && (
-            <div className="bg-destructive/10 border border-destructive/20 rounded-lg p-3 mx-4">
-              <p className="text-sm text-destructive">{error}</p>
+            <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+              <p className="text-sm text-red-700">{error}</p>
               <button
                 onClick={clearError}
-                className="text-xs text-destructive hover:underline mt-1"
+                className="text-xs text-red-600 hover:underline mt-1"
               >
                 Dismiss
               </button>
             </div>
           )}
-          
-          <div ref={messagesEndRef} />
         </div>
+        <div ref={messagesEndRef} />
+      </div>
 
-        {/* Input Area */}
-        <div className="border-t pt-4">
-          <div className="flex space-x-2">
+      {/* Input Area */}
+      <div className="sticky bottom-0 bg-background p-4">
+        <div className="max-w-4xl mx-auto">
+          <div className="relative">
             <Input
               value={inputMessage}
               onChange={(e) => setInputMessage(e.target.value)}
-              onKeyPress={handleKeyPress}
-              placeholder="Ask me about Bitcoin..."
+              onKeyDown={handleKeyDown}
+              placeholder="Message Bitcoin ChatGPT..."
               disabled={isLoading}
-              className="flex-1"
+              className="pr-12 py-3 rounded-2xl border-border focus:border-bitcoin-orange"
             />
             <Button
               onClick={handleSendMessage}
               disabled={isLoading || !inputMessage.trim()}
-              variant="bitcoin"
-              size="icon"
+              size="sm"
+              className="absolute right-2 top-1/2 transform -translate-y-1/2 w-8 h-8 p-0 rounded-full bg-bitcoin-orange hover:bg-bitcoin-orange/90 disabled:bg-muted disabled:text-muted-foreground"
             >
               {isLoading ? (
                 <LoadingSpinner size="sm" />
               ) : (
-                <Send className="w-4 h-4" />
+                <ArrowUp className="w-4 h-4" />
               )}
             </Button>
           </div>
-          <p className="text-xs text-muted-foreground mt-2">
-            Press Enter to send • Shift+Enter for new line
-          </p>
         </div>
-      </CardContent>
-    </Card>
+      </div>
+    </div>
   )
 }
