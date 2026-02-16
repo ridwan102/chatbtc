@@ -23,7 +23,7 @@ httpx==0.25.2
 aiohttp==3.9.0
 
 # Crypto/Bitcoin APIs
-requests==2.31.0
+requests==2.32.4
 
 # Text Processing & NLP
 nltk==3.8.1
